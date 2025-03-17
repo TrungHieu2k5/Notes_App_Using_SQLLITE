@@ -1,8 +1,10 @@
 package com.example.notes_appusingsqlitedatabase
 
 import android.content.Context
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,10 +37,12 @@ val noteColors = listOf(
     Color(0xFFD2A5FF)  // Light Purple
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NotesApp(
     context: Context,
-    addCreateNote: () -> Unit
+    addCreateNote: () -> Unit,
+    onNoteClick: (Notes) -> Unit // Callback để mở ScreenNotes khi nhấn
 ) {
     val dbHelper = remember { NoteDatabaseHelper(context) }
     val notes = remember { mutableStateOf(dbHelper.getAllNotes()) }
@@ -47,7 +51,7 @@ fun NotesApp(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1C1C1C)) // Darker background matching the image
+            .background(Color(0xFF1C1C1C))
     ) {
         Column(
             modifier = Modifier
@@ -73,7 +77,7 @@ fun NotesApp(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF444444)), // Darker gray for buttons
+                            .background(Color(0xFF444444)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -89,7 +93,7 @@ fun NotesApp(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF444444)), // Darker gray for buttons
+                            .background(Color(0xFF444444)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -145,9 +149,17 @@ fun NotesApp(
                         val backgroundColor = noteColors[colorIndex]
 
                         Box(
-                            modifier = Modifier.clickable {
-                                selectedNoteId = if (selectedNoteId == note.id) null else note.id
-                            }
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {
+                                        // Nhấn một lần: Mở ScreenNotes
+                                        onNoteClick(note)
+                                    },
+                                    onLongClick = {
+                                        // Giữ lâu: Hiển thị nút xóa
+                                        selectedNoteId = if (selectedNoteId == note.id) null else note.id
+                                    }
+                                )
                         ) {
                             ColorfulNoteItem(
                                 note = note,
@@ -207,7 +219,6 @@ fun ColorfulNoteItem(note: Notes, backgroundColor: Color, isSelected: Boolean = 
             .background(backgroundColor)
             .padding(16.dp)
     ) {
-        // Display just the title for cleaner look, as shown in the image
         Text(
             text = note.title,
             color = Color.Black,
@@ -228,7 +239,8 @@ fun NotesAppPreview() {
     ) {
         NotesApp(
             context = context,
-            addCreateNote = {}
+            addCreateNote = {},
+            onNoteClick = {} // Placeholder, sẽ được xử lý trong navigation
         )
     }
 }

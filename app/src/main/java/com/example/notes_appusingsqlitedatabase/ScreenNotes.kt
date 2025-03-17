@@ -23,7 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
+fun ScreenNotes(
+    backScreenHome: () -> Unit,
+    context: Context,
+    note: Notes? = null // Thêm tham số để nhận dữ liệu ghi chú
+) {
     val darkBackground = Color(0xFF121212)
     val darkSecondary = Color(0xFF252525)
     val darkGray = Color(0xFF333333)
@@ -31,8 +35,9 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
     val accentColor = Color(0xFF4DD0E1)
 
     val dbHelper = remember { NoteDatabaseHelper(context) }
-    var text by remember { mutableStateOf(TextFieldValue("")) }
-    var title by remember { mutableStateOf(TextFieldValue("Title")) }
+    // Khởi tạo giá trị từ note nếu có, nếu không thì để mặc định
+    var text by remember { mutableStateOf(TextFieldValue(note?.content ?: "")) }
+    var title by remember { mutableStateOf(TextFieldValue(note?.title ?: "Title")) }
 
     Column(
         modifier = Modifier
@@ -40,7 +45,6 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
             .background(darkBackground)
             .padding(bottom = 0.dp)
     ) {
-        // Top Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -48,7 +52,6 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Back button
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -56,7 +59,7 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
                     .background(darkGray),
                 contentAlignment = Alignment.Center
             ) {
-                IconButton(onClick = {backScreenHome()}) {
+                IconButton(onClick = { backScreenHome() }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
@@ -65,10 +68,8 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
                 }
             }
 
-            // Spacer to push other elements to the right
             Spacer(modifier = Modifier.weight(1f))
 
-            // View button
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -85,7 +86,6 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Save button
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -94,7 +94,11 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
                 contentAlignment = Alignment.Center
             ) {
                 IconButton(onClick = {
-                    dbHelper.insertNote(title.text, text.text)
+                    if (note == null) {
+                        dbHelper.insertNote(title.text, text.text)
+                    } else {
+                        dbHelper.updateNote(note.id, title.text, text.text)
+                    }
                     backScreenHome()
                 }) {
                     Icon(
@@ -106,7 +110,6 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
             }
         }
 
-        // Title Field
         BasicTextField(
             value = title,
             onValueChange = { title = it },
@@ -120,7 +123,6 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-        // Content Field
         BasicTextField(
             value = text,
             onValueChange = { text = it },
@@ -148,7 +150,6 @@ fun ScreenNotes(backScreenHome:() -> Unit,context: Context) {
     }
 }
 
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ScreenNotesPreview() {
@@ -170,4 +171,3 @@ fun FormatButton(icon: androidx.compose.ui.graphics.vector.ImageVector, descript
         tint = Color(0xFFAAAAAA)
     )
 }
-

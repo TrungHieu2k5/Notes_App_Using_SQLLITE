@@ -28,7 +28,19 @@ class NoteDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "Notes.db
             put("title", title)
             put("content", content)
         }
-        return db.insert("notes", null, values)
+        val result = db.insert("notes", null, values)
+        db.close()
+        return result
+    }
+
+    fun updateNote(id: Int, title: String, content: String) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("title", title)
+            put("content", content)
+        }
+        db.update("notes", values, "id=?", arrayOf(id.toString()))
+        db.close()
     }
 
     fun getAllNotes(): List<Notes> {
@@ -44,11 +56,13 @@ class NoteDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "Notes.db
         }
 
         cursor.close()
+        db.close()
         return notes
     }
 
     fun deleteNote(id: Int) {
         val db = writableDatabase
         db.delete("notes", "id=?", arrayOf(id.toString()))
+        db.close()
     }
 }
