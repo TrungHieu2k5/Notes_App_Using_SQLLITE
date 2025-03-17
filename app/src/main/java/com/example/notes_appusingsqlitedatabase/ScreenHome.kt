@@ -27,14 +27,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// List of colors to be used for note backgrounds
+
 val noteColors = listOf(
-    Color(0xFFFF0000), // Red for delete
-    Color(0xFFFFB2A5), // Salmon
-    Color(0xFFA5FFB2), // Light Green
-    Color(0xFFFFF2A5), // Light Yellow
-    Color(0xFFA5F2FF), // Light Blue
-    Color(0xFFD2A5FF)  // Light Purple
+    Color(0xFFFF0000),
+    Color(0xFFFFB2A5),
+    Color(0xFFA5FFB2),
+    Color(0xFFFFF2A5),
+    Color(0xFFA5F2FF),
+    Color(0xFFD2A5FF)
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -117,7 +117,7 @@ fun NotesApp(
                     ) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Create your first note !",
+                            text = "Tạo ghi chú đầu tiên của bạn !",
                             color = Color.White,
                             fontSize = 24.sp
                         )
